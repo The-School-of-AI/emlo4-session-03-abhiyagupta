@@ -28,9 +28,21 @@ def main():
     save_dir = "/opt/mount"
     
     # init model and load checkpoint here
-    model = 
+    model = Net()  #  model architecture defined in model.py
+    checkpoint_path = "mnist_cnn.pt"  # Path to the saved model checkpoint
+    model.load_state_dict(torch.load(checkpoint_path))
+    
 
 	# create transforms and test dataset for mnist
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))  # Normalization values for MNIST
+    ])
+
+    # Load the MNIST test dataset
+    dataset = datasets.MNIST(
+        "/opt/mount", train=False, download=True, transform=transform
+    )
 
     infer(model, dataset, save_dir)
     print("Inference completed. Results saved in the 'results' folder.")

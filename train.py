@@ -13,6 +13,12 @@ def train(rank, args, model, dataset, dataloader_kwargs):
     torch.manual_seed(args.seed + rank)
     # training code for mnist hogwild
 
+    train_loader = torch.utils.data.DataLoader(dataset, **dataloader_kwargs)
+
+    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+    for epoch in range(1, args.epochs + 1):
+        train_epoch(epoch, args, model, device, train_loader, optimizer)
+
 
 def main():
     parser = argparse.ArgumentParser(description="MNIST Training Script")
@@ -33,7 +39,7 @@ def main():
     parser.add_argument(
         "--momentum",
         type=float,
-        default=0.5,
+        default=0.5,  
         metavar="M",
         help="SGD momentum (default: 0.5)",
     )
@@ -63,9 +69,27 @@ def main():
     parser.add_argument(
         "--save-dir", default="./", help="checkpoint will be saved in this directory"
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        '--epochs', 
+        type=int, 
+        default=1, 
+        metavar='N', 
+        help='number of epochs to train (default: 10)'
+    ) 
+    parser.add_argument('--save_model', action='store_true', default=False,
+                    help='save the trained model to state_dict')
+
+
+
+    args, unknown = parser.parse_known_args()                
+
+
+    #args = parser.parse_args()
 
     torch.manual_seed(args.seed)
+    mp.set_start_method("spawn", force=True)
+
+    model = Net()
     # create model and setup mp
 
     model.share_memory()
@@ -78,13 +102,33 @@ def main():
     }
 
     # create mnist train dataset
+                    
+    transform=transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.1307,), (0.3081,))
+        ])
+    dataset1 = datasets.MNIST('../data', train=True, download=True,
+                       transform=transform)
+    dataset2 = datasets.MNIST('../data', train=False,
+                       transform=transform)
 
     # mnist hogwild training process
     processes = []
+                     
+    for rank in range(args.num_processes):
+        #p = mp.Process(target=train, args=(rank, args, model, device,
+        p = mp.Process(target=train, args=(rank, args, model, dataset1, kwargs))                       
+        
+        # We first train the model across `num_processes` processes
+        p.start()
+        processes.append(p)
+    for p in processes:
+        p.join()
 
-
-# save model ckpt
-
-
+ # save model check point   
+    if args.save_model: 
+        torch.save(model.state_dict(), "mnist_cnn.pt")  
+          
+        
 if __name__ == "__main__":
     main()
