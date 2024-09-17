@@ -17,7 +17,7 @@ def train(rank, args, model, dataset, dataloader_kwargs):
 
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
     for epoch in range(1, args.epochs + 1):
-        train_epoch(epoch, args, model, device, train_loader, optimizer)
+        train_epoch(epoch, args, model, train_loader, optimizer)
 
 
 def main():
@@ -109,8 +109,8 @@ def main():
         ])
     dataset1 = datasets.MNIST('../data', train=True, download=True,
                        transform=transform)
-    dataset2 = datasets.MNIST('../data', train=False,
-                       transform=transform)
+    # dataset2 = datasets.MNIST('../data', train=False,
+    #                    transform=transform)
 
     # mnist hogwild training process
     processes = []

@@ -35,14 +35,14 @@ def main():
     parser.add_argument(
         "--save-dir", default="./", help="checkpoint will be saved in this directory"
     )
-     parser.add_argument(
+    parser.add_argument(
         "--test-batch-size", type=int, default=1000, metavar="N", help="input batch size for testing (default: 1000)"
     )
     parser.add_argument(
         "--model-checkpoint", default="mnist_cnn.pt", help="path to the saved model checkpoint"
     )
 
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
     torch.manual_seed(args.seed)
 
     kwargs = {
@@ -57,9 +57,9 @@ def main():
 
     # create MNIST test dataset and loader
     test_dataset = datasets.MNIST(
-        "/opt/mount", train=False, download=True, transform=transform
+        "../data", train=False, download=True, transform=transform
     )
-    test_loader = DataLoader(dataset2, **kwargs)
+    test_loader = DataLoader(test_dataset, **kwargs)
 
     # create model and load state dict
     # Load model
