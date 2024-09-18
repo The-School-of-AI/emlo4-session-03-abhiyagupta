@@ -1,5 +1,7 @@
 import torch
-from torch.nn import Conv2d, MaxPool2d, Linear, Sequential, ReLU, LogSoftmax, Flatten
+import torch.nn as nn 
+import torch.nn.functional as F
+from torch.nn import Conv2d, MaxPool2d, Linear, Sequential, ReLU, LogSoftmax, Flatten 
 
 
 class Net(torch.nn.Module):

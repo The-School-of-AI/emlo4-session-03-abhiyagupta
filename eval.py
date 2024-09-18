@@ -1,10 +1,12 @@
 import json
 import torch
+import torch.nn as nn 
 import torch.nn.functional as F
 import argparse
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 from pathlib import Path
+from model import Net 
 
 
 def test_epoch(model, data_loader):
@@ -56,26 +58,22 @@ def main():
     )
 
     # create MNIST test dataset and loader
-    test_dataset = datasets.MNIST(
-        "../data", train=False, download=True, transform=transform
-    )
-    test_loader = DataLoader(test_dataset, **kwargs)
+    test_dataset = datasets.MNIST('/opt/mount', train=False, download=True, transform=transform)
+    test_loader = DataLoader(test_dataset, batch_size=1000, shuffle=False)
 
-    # create model and load state dict
     # Load model
-    model = Net().to(device)
-    model.load_state_dict(torch.load(args.model_checkpoint))
-    model.eval()
+    model = Net()
+    checkpoint_path = "/opt/mount/model/mnist_cnn.pt"
+    model.load_state_dict(torch.load(checkpoint_path))
 
     # Run the test epoch and collect evaluation results
-    eval_results = test_epoch(model, test_loader, device)
+    eval_results = test_epoch(model, test_loader)
 
-    # Save evaluation results to a JSON file
-    results_path = Path(args.save_dir) / "eval_results.json"
+    # # Save evaluation results to a JSON file
+    # results_path = Path(args.save_dir) / "eval_results.json"
 
-    # test epoch function call
-
-    with (Path(args.save_dir) / "model" / "eval_results.json").open("w") as f:
+    # Save evaluation metrics
+    with open("/opt/mount/model/eval_results.json", "w") as f:
         json.dump(eval_results, f)
 
 
