@@ -29,7 +29,7 @@ def main():
     
     # init model and load checkpoint here
     model = Net()  #  model architecture defined in model.py
-    checkpoint_path = "mnist_cnn.pt"  # Path to the saved model checkpoint
+    checkpoint_path = "/opt/mount/model/mnist_cnn.pt"  # Path to the saved model checkpoint
     model.load_state_dict(torch.load(checkpoint_path))
     
 

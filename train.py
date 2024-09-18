@@ -34,7 +34,10 @@ def train(rank, args, model, dataloader_kwargs):
     for epoch in range(1, args.epochs + 1):
         train_epoch(epoch, args, model, train_loader, optimizer)
 
-def main():
+def main(): 
+
+    save_dir = "/opt/mount" 
+    
     parser = argparse.ArgumentParser(description="MNIST Training Script")
     parser.add_argument("--batch-size", type=int, default=64, metavar="N", help="input batch size for training (default: 64)")
     parser.add_argument("--lr", type=float, default=0.01, metavar="LR", help="learning rate (default: 0.01)")
@@ -43,7 +46,7 @@ def main():
     parser.add_argument("--log-interval", type=int, default=10, metavar="N", help="how many batches to wait before logging training status")
     parser.add_argument("--num-processes", type=int, default=2, metavar="N", help="how many training processes to use (default: 2)")
     parser.add_argument("--dry-run", action="store_true", default=False, help="quickly check a single pass")
-    parser.add_argument("--save-dir", default="/opt/mount", help="checkpoint will be saved in this directory")
+    parser.add_argument("--save_dir", default="/opt/mount", help="checkpoint will be saved in this directory")
     parser.add_argument('--epochs', type=int, default=1, metavar='N', help='number of epochs to train (default: 1)')
     parser.add_argument('--save_model', action='store_true', default=False, help='save the trained model to state_dict')
 
@@ -68,6 +71,8 @@ def main():
         processes.append(p)
     for p in processes:
         p.join()
+
+    
 
     if args.save_model:
         os.makedirs(os.path.join(args.save_dir, "model"), exist_ok=True)

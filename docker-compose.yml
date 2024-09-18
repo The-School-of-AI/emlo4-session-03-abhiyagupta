@@ -41,7 +41,7 @@ services:
       - mnist:/opt/mount 
      command: ["python", "infer.py"]
      depends_on:
-      - evaluate
+     - evaluate
 
 volumes:
     # create volumes here

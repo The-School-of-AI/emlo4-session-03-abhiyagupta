@@ -35,13 +35,13 @@ def main():
         "--seed", type=int, default=1, metavar="S", help="random seed (default: 1)"
     )
     parser.add_argument(
-        "--save-dir", default="./", help="checkpoint will be saved in this directory"
+        "--save_dir", default="/opt/mount", help="checkpoint will be saved in this directory"
     )
     parser.add_argument(
         "--test-batch-size", type=int, default=1000, metavar="N", help="input batch size for testing (default: 1000)"
     )
     parser.add_argument(
-        "--model-checkpoint", default="mnist_cnn.pt", help="path to the saved model checkpoint"
+        "--model-checkpoint", default="/opt/mount/model/mnist_cnn.pt", help="path to the saved model checkpoint"
     )
 
     args, unknown = parser.parse_known_args()
@@ -63,7 +63,7 @@ def main():
 
     # Load model
     model = Net()
-    checkpoint_path = "/opt/mount/model/mnist_cnn.pt"
+    checkpoint_path = "/opt/mount/model/mnist_cnn.pt" 
     model.load_state_dict(torch.load(checkpoint_path))
 
     # Run the test epoch and collect evaluation results
@@ -73,7 +73,7 @@ def main():
     # results_path = Path(args.save_dir) / "eval_results.json"
 
     # Save evaluation metrics
-    with open("/opt/mount/model/eval_results.json", "w") as f:
+    with (Path(args.save_dir) / "model" / "eval_results.json").open("w") as f:
         json.dump(eval_results, f)
 
 
