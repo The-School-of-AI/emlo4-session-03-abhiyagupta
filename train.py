@@ -8,6 +8,7 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader 
 import torch.multiprocessing as mp
 from model import Net
+import time
 
 def train_epoch(epoch, args, model, train_loader, optimizer):
     model.train()
@@ -48,7 +49,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true", default=False, help="quickly check a single pass")
     parser.add_argument("--save_dir", default="/opt/mount", help="checkpoint will be saved in this directory")
     parser.add_argument('--epochs', type=int, default=1, metavar='N', help='number of epochs to train (default: 1)')
-    parser.add_argument('--save_model', action='store_true', default=False, help='save the trained model to state_dict')
+    parser.add_argument('--save_model', action='store_true', default=True, help='save the trained model to state_dict')
 
     args = parser.parse_args()
     torch.manual_seed(args.seed)
@@ -77,6 +78,9 @@ def main():
     if args.save_model:
         os.makedirs(os.path.join(args.save_dir, "model"), exist_ok=True)
         torch.save(model.state_dict(), os.path.join(args.save_dir, "model", "mnist_cnn.pt"))
+
+    # time.sleep(10000)
+        #/opt/mount/model/mnist.pt
 
 if __name__ == "__main__":
     main()

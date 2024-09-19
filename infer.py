@@ -14,14 +14,30 @@ def infer(model, dataset, save_dir, num_samples=5):
     results_dir.mkdir(parents=True, exist_ok=True)
 
     indices = random.sample(range(len(dataset)), num_samples)
-    for idx in indices:
-        image, _ = dataset[idx]
+
+    for idx, i in enumerate(indices):
+        image, _ = dataset[i]
         with torch.no_grad():
             output = model(image.unsqueeze(0))
         pred = output.argmax(dim=1, keepdim=True).item()
 
         img = Image.fromarray(image.squeeze().numpy() * 255).convert("L")
-        img.save(results_dir / f"{pred}.png")
+        # Ensure unique filenames
+        filename = f"{pred}_{idx}.png"
+        img.save(results_dir / filename)
+
+    print(f"Saved {num_samples} inference result images.")
+
+    # for idx in indices:
+    #     image, _ = dataset[idx]
+    
+    #     with torch.no_grad():
+    #         output = model(image.unsqueeze(0))
+    #     pred = output.argmax(dim=1, keepdim=True).item()
+
+    #     img = Image.fromarray(image.squeeze().numpy() * 255).convert("L")
+    #     img.save(results_dir / f"{pred}_{i}.png")
+    #     i +=1
 
 
 def main():

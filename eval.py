@@ -9,21 +9,20 @@ from pathlib import Path
 from model import Net 
 
 
-def test_epoch(model, data_loader):
-    # write code to test this epoch
+def test_epoch(model, device, data_loader):
     model.eval()
     test_loss = 0
     correct = 0
     with torch.no_grad():
         for data, target in data_loader:
             output = model(data.to(device))
-            test_loss += F.nll_loss(output, target.to(device), reduction='sum').item() # sum up batch loss
-            pred = output.max(1)[1] # get the index of the max log-probability
-            correct += pred.eq(target.to(device)).sum().item()
+            test_loss += F.nll_loss(output, target.to(device), reduction='sum').item()
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.to(device).view_as(pred)).sum().item()
 
-    test_loss /= len(data_loader.dataset)      
-    accuracy = 100.0 * correct / len(data_loader.dataset)
-    out = {"Test loss": test_loss, "Accuracy": accuracy}
+    test_loss /= len(data_loader.dataset)
+    accuracy = 100. * correct / len(data_loader.dataset)
+    out = {'Test loss': test_loss, 'Accuracy': accuracy}
     print(out)
     return out
 
@@ -45,7 +44,13 @@ def main():
     )
 
     args, unknown = parser.parse_known_args()
+    use_cuda = torch.cuda.is_available()  
     torch.manual_seed(args.seed)
+     
+    device = torch.device("cuda" if use_cuda else "cpu")
+    kwargs = {'batch_size': args.test_batch_size}
+    if use_cuda:
+        kwargs.update({'num_workers': 1, 'pin_memory': True, 'shuffle': True},)
 
     kwargs = {
         "batch_size": args.test_batch_size,
@@ -67,7 +72,7 @@ def main():
     model.load_state_dict(torch.load(checkpoint_path))
 
     # Run the test epoch and collect evaluation results
-    eval_results = test_epoch(model, test_loader)
+    eval_results = test_epoch(model, device, test_loader)
 
     # # Save evaluation results to a JSON file
     # results_path = Path(args.save_dir) / "eval_results.json"
